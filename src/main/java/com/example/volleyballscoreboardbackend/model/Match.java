@@ -27,4 +27,11 @@ public class Match {
     private String timeline;
 
     private Status status;
+
+    public enum Status {
+        PLANNED,
+        IN_PROGRESS,
+        FINISHED
+    }
+
 }
