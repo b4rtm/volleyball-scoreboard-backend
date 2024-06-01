@@ -8,10 +8,9 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class UserController {
 
-    @MessageMapping("/hello")
-    @SendTo("/topic/greetings")
-    public String greeting(AuthDto authData) throws Exception {
-        Thread.sleep(1000);
-        return "udalo sie!!!" + authData.getLogin();
+    @MessageMapping("/auth")
+    @SendTo("/topic/authRes")
+    public String greeting(AuthDto authData) {
+        return "udalo sie zalogowac dla: " + authData.getLogin();
     }
 }
