@@ -8,6 +8,12 @@ import lombok.Data;
 @Table(name = "users")
 public class User {
 
+    public User(String login, String password, Role role){
+        this.login = login;
+        this.password = password;
+        this.role = role;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -15,6 +21,10 @@ public class User {
     private String login;
     private String password;
     private Role role;
+
+    public User() {
+
+    }
 
     public enum Role {
         ROLE_OBSERVER,
