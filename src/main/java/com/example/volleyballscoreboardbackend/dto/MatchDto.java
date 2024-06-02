@@ -12,4 +12,12 @@ public class MatchDto {
     private String date;
 
     private String status;
+
+    private Integer setsToWin;
+
+    private Integer pointsToWinSet;
+
+    private Boolean isTieBreak;
+
+    private Integer pointsToWinTieBreak;
 }
