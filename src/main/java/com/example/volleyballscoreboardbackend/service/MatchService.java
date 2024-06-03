@@ -6,6 +6,8 @@ import com.example.volleyballscoreboardbackend.model.Match;
 import com.example.volleyballscoreboardbackend.repository.MatchRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class MatchService {
 
@@ -22,5 +24,9 @@ public class MatchService {
 
         Match match = matchDtoMapper.map(matchDto);
         return matchRepository.save(match);
+    }
+
+    public List<Match> getMatches(){
+        return matchRepository.findAll();
     }
 }
