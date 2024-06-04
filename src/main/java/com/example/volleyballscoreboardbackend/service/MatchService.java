@@ -31,7 +31,4 @@ public class MatchService {
         return matchRepository.save(match);
     }
 
-    public List<Match> getMatches(){
-        return matchRepository.findAll();
-    }
 }
