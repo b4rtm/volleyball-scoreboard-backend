@@ -8,8 +8,6 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
-import java.util.List;
-
 @Controller
 public class MatchController {
 
@@ -18,9 +16,10 @@ public class MatchController {
 
     @MessageMapping("/addMatch")
     @SendTo("/topic/matches")
-    public List<Match> addMatch(MatchDto match) {
-        matchService.addMatch(match);
-        return matchService.getAllMatches();
+    public Match addMatch(MatchDto match) {
+
+        Match savedMatch = matchService.addMatch(match);
+        return savedMatch;
     }
 
 }
