@@ -28,6 +28,14 @@ public class Match {
 
     private Status status;
 
+    private Integer setsToWin;
+
+    private Integer pointsToWinSet;
+
+    private Boolean isTieBreak;
+
+    private Integer pointsToWinTieBreak;
+
     public enum Status {
         PLANNED,
         IN_PROGRESS,

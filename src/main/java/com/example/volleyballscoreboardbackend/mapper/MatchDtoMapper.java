@@ -6,8 +6,6 @@ import com.example.volleyballscoreboardbackend.model.Team;
 import com.example.volleyballscoreboardbackend.repository.TeamRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
-
 @Service
 public class MatchDtoMapper {
 
@@ -30,6 +28,11 @@ public class MatchDtoMapper {
 
         match.setTeamA(teamA);
         match.setTeamB(teamB);
+
+        match.setSetsToWin(dto.getSetsToWin());
+        match.setPointsToWinSet(dto.getPointsToWinSet());
+        match.setIsTieBreak(dto.getIsTieBreak());
+        match.setPointsToWinTieBreak(dto.getPointsToWinTieBreak());
 
         return match;
     }

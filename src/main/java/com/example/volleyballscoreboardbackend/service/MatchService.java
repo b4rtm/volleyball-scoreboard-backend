@@ -3,6 +3,7 @@ package com.example.volleyballscoreboardbackend.service;
 import com.example.volleyballscoreboardbackend.dto.MatchDto;
 import com.example.volleyballscoreboardbackend.mapper.MatchDtoMapper;
 import com.example.volleyballscoreboardbackend.model.Match;
+import com.example.volleyballscoreboardbackend.model.Team;
 import com.example.volleyballscoreboardbackend.repository.MatchRepository;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,10 @@ public class MatchService {
     public MatchService(MatchDtoMapper matchDtoMapper, MatchRepository matchRepository) {
         this.matchDtoMapper = matchDtoMapper;
         this.matchRepository = matchRepository;
+    }
+
+    public List<Match> getAllMatches() {
+        return matchRepository.findAll();
     }
 
     public Match addMatch(MatchDto matchDto) {
