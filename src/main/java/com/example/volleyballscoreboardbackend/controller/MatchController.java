@@ -20,8 +20,14 @@ public class MatchController {
 
     @MessageMapping("/addMatch")
     @SendTo("/topic/matches")
-    public List<Match> addMatch(MatchDto match) {
-        matchService.addMatch(match);
+    public Match addMatch(MatchDto match) {
+
+        return matchService.addMatch(match);
+    }
+
+    @MessageMapping("/getMatches")
+    @SendTo("/topic/matches")
+    public List<Match> getMatches() {
         return matchService.getAllMatches();
     }
 
