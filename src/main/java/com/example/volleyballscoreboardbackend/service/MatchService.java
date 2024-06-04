@@ -8,6 +8,7 @@ import com.example.volleyballscoreboardbackend.repository.MatchRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MatchService {
@@ -31,4 +32,7 @@ public class MatchService {
         return matchRepository.save(match);
     }
 
+    public Optional<Match> getMatchById(Long matchId) {
+        return matchRepository.findById(matchId);
+    }
 }
