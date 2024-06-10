@@ -29,6 +29,9 @@ public class MatchService {
     public Match addMatch(MatchDto matchDto) {
 
         Match match = matchDtoMapper.map(matchDto);
+        if (match.getTimeline() == null){
+            match.setTimeline("[]");
+        }
         return matchRepository.save(match);
     }
 
