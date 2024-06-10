@@ -45,4 +45,10 @@ public class MatchController {
         return match;
     }
 
+    @MessageMapping("/deleteMatch/{matchId}")
+    @SendTo("/topic/matches/{matchId}")
+    public void deleteMatch(@DestinationVariable Long matchId) {
+        matchService.deleteMatch(matchId);
+    }
+
 }

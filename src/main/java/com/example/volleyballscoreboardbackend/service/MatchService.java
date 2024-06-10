@@ -32,6 +32,10 @@ public class MatchService {
         return matchRepository.save(match);
     }
 
+    public void deleteMatch(Long matchId){
+        matchRepository.deleteById(matchId);
+    }
+
     public Optional<Match> getMatchById(Long matchId) {
         return matchRepository.findById(matchId);
     }
