@@ -26,6 +26,8 @@ public class Match {
 
     private String timeline;
 
+    private String setsTimes;
+
     private Status status;
 
     private Integer setsToWin;

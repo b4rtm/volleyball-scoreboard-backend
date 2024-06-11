@@ -38,6 +38,8 @@ public class MatchService {
         if (match.getTimeline() == null){
             match.setTimeline("[]");
         }
+
+        match.setSetsTimes("[]");
         return matchRepository.save(match);
     }
 
