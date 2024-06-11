@@ -40,6 +40,13 @@ public class MatchController {
         return matchService.getAllMatches();
     }
 
+    @MessageMapping("/timeout/{matchId}")
+    @SendTo("/topic/matches")
+    public List<Match> updateTimeout(@DestinationVariable Long matchId, Long teamId) {
+        matchService.takeTimeout(matchId, teamId);
+        return matchService.getAllMatches();
+    }
+
     @MessageMapping("/deleteMatch/{matchId}")
     @SendTo("/topic/matches")
     public List<Match> deleteMatch(@DestinationVariable Long matchId) {
