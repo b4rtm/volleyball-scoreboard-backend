@@ -12,10 +12,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
 public class MatchService {
+
+    public static final int NUMBER_OF_TIMEOUTS = 2;
 
     private final MatchDtoMapper matchDtoMapper;
 
@@ -53,8 +56,7 @@ public class MatchService {
         Match match = matchRepository.findById(matchId).orElseThrow(() -> new IllegalArgumentException("match not found"));
         try {
             String timeline = match.getTimeline();
-            List<List<ScoreDto>> timelineList = objectMapper.readValue(timeline, new TypeReference<>() {
-            });
+            List<List<ScoreDto>> timelineList = objectMapper.readValue(timeline, new TypeReference<>() {});
 
             List<ScoreDto> lastSet;
             if (timelineList.isEmpty()) {
@@ -69,6 +71,34 @@ public class MatchService {
             match.setTimeline(updatedTimeline);
 
             matchRepository.save(match);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to process timeline JSON", e);
+        }
+    }
+
+    public void takeTimeout(Long matchId, Long teamId) {
+        Match match = matchRepository.findById(matchId).orElseThrow(() -> new IllegalArgumentException("match not found"));
+        try {
+            String timeline = match.getTimeline();
+            List<List<ScoreDto>> timelineList = objectMapper.readValue(timeline, new TypeReference<>() {});
+
+            List<ScoreDto> lastSet;
+            if (timelineList.isEmpty()) {
+                return;
+            }
+            lastSet = timelineList.get(timelineList.size() - 1);
+            ScoreDto lastScore = lastSet.get(lastSet.size() - 1);
+
+            List<ScoreDto> listOfTeamTimeouts = lastSet.stream().filter(scoreDto -> !Objects.equals(scoreDto.getTeamId(), teamId) && scoreDto.getOpponentBreak() == 1).toList();
+
+            if(!Objects.equals(lastScore.getTeamId(), teamId) && listOfTeamTimeouts.size() < NUMBER_OF_TIMEOUTS){
+                lastScore.setOpponentBreak(1);
+                String updatedTimeline = objectMapper.writeValueAsString(timelineList);
+                match.setTimeline(updatedTimeline);
+
+                matchRepository.save(match);
+            }
+
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Failed to process timeline JSON", e);
         }
