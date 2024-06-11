@@ -1,6 +1,7 @@
 package com.example.volleyballscoreboardbackend.controller;
 
 import com.example.volleyballscoreboardbackend.dto.MatchDto;
+import com.example.volleyballscoreboardbackend.dto.ScoreDto;
 import com.example.volleyballscoreboardbackend.model.Match;
 import com.example.volleyballscoreboardbackend.service.MatchService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +9,6 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -37,12 +37,11 @@ public class MatchController {
         return matchService.getMatchById(matchId).orElse(new Match());
     }
 
-    @MessageMapping("/updateMatch/{matchId}")
+    @MessageMapping("/updateScore/{matchId}")
     @SendTo("/topic/matches/{matchId}")
-    public Match updateMatch(@DestinationVariable Long matchId, Match match) {
-        // Aktualizuj mecz w bazie danych
-        // matchService.updateMatch(match);
-        return match;
+    public List<Match> updateScore(@DestinationVariable Long matchId, ScoreDto score) {
+        matchService.addScore(matchId, score);
+        return matchService.getAllMatches();
     }
 
     @MessageMapping("/deleteMatch/{matchId}")

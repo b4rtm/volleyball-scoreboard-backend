@@ -1,12 +1,16 @@
 package com.example.volleyballscoreboardbackend.service;
 
 import com.example.volleyballscoreboardbackend.dto.MatchDto;
+import com.example.volleyballscoreboardbackend.dto.ScoreDto;
 import com.example.volleyballscoreboardbackend.mapper.MatchDtoMapper;
 import com.example.volleyballscoreboardbackend.model.Match;
-import com.example.volleyballscoreboardbackend.model.Team;
 import com.example.volleyballscoreboardbackend.repository.MatchRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +20,8 @@ public class MatchService {
     private final MatchDtoMapper matchDtoMapper;
 
     private final MatchRepository matchRepository;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public MatchService(MatchDtoMapper matchDtoMapper, MatchRepository matchRepository) {
         this.matchDtoMapper = matchDtoMapper;
@@ -41,5 +47,30 @@ public class MatchService {
 
     public Optional<Match> getMatchById(Long matchId) {
         return matchRepository.findById(matchId);
+    }
+
+    public void addScore(Long matchId, ScoreDto score) {
+        Match match = matchRepository.findById(matchId).orElseThrow(() -> new IllegalArgumentException("match not found"));
+        try {
+            String timeline = match.getTimeline();
+            List<List<ScoreDto>> timelineList = objectMapper.readValue(timeline, new TypeReference<>() {
+            });
+
+            List<ScoreDto> lastSet;
+            if (timelineList.isEmpty()) {
+                lastSet = new ArrayList<>();
+                timelineList.add(lastSet);
+            } else {
+                lastSet = timelineList.get(timelineList.size() - 1);
+            }
+
+            lastSet.add(score);
+            String updatedTimeline = objectMapper.writeValueAsString(timelineList);
+            match.setTimeline(updatedTimeline);
+
+            matchRepository.save(match);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to process timeline JSON", e);
+        }
     }
 }
