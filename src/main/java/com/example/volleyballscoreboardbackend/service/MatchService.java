@@ -40,11 +40,7 @@ public class MatchService {
     public Match addMatch(MatchDto matchDto) {
 
         Match match = matchDtoMapper.map(matchDto);
-        if (match.getTimeline() == null){
-            match.setTimeline("[]");
-        }
 
-        match.setSetsTimes("[]");
         return matchRepository.save(match);
     }
 

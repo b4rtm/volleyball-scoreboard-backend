@@ -33,7 +33,13 @@ public class MatchDtoMapper {
         match.setPointsToWinSet(dto.getPointsToWinSet());
         match.setIsTieBreak(dto.getIsTieBreak());
         match.setPointsToWinTieBreak(dto.getPointsToWinTieBreak());
+        if (match.getTimeline() == null){
+            match.setTimeline("[]");
+        }
 
+        match.setSetsTimes("[]");
+        match.setResultDetailed("{\"resD\": []}");
+        match.setResult("0:0");
         return match;
     }
 
