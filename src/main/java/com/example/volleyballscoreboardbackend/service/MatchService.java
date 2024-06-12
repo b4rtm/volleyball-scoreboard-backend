@@ -4,14 +4,20 @@ import com.example.volleyballscoreboardbackend.dto.MatchDto;
 import com.example.volleyballscoreboardbackend.dto.ScoreDto;
 import com.example.volleyballscoreboardbackend.mapper.MatchDtoMapper;
 import com.example.volleyballscoreboardbackend.model.Match;
+import com.example.volleyballscoreboardbackend.model.SetRecord;
 import com.example.volleyballscoreboardbackend.repository.MatchRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.google.gson.Gson;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import com.google.gson.reflect.TypeToken;
+import java.lang.reflect.Type;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -107,6 +113,19 @@ public class MatchService {
     public void endSet(Long matchId){
         Match match = matchRepository.findById(matchId).orElseThrow(() -> new IllegalArgumentException("match not found"));
         try {
+            LocalDateTime currentDateTime = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+            String formattedDateTime = currentDateTime.format(formatter);
+
+            String setsTimes = matchRepository.getSetsTimesByMatchId(matchId);
+
+            Gson gson = new Gson();
+            Type setType = new TypeToken<List<SetRecord>>(){}.getType();
+
+            List<SetRecord> setRecords = gson.fromJson(setsTimes, setType);
+            setRecords.get(setRecords.size() - 1).setSetEndTime(formattedDateTime);
+            setRecords.add(new SetRecord(formattedDateTime, ""));
+
             String timeline = match.getTimeline();
             List<List<ScoreDto>> timelineList = objectMapper.readValue(timeline, new TypeReference<>() {});
 
@@ -133,6 +152,8 @@ public class MatchService {
 
             String resD = addResult(match.getResultDetailed(),teamAPoints + ":"+ teamBPoints);
             match.setResultDetailed(resD);
+
+            match.setSetsTimes(gson.toJson(setRecords));
             matchRepository.save(match);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Failed to process timeline JSON", e);
