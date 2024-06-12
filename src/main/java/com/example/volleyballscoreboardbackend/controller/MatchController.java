@@ -54,4 +54,11 @@ public class MatchController {
         return matchService.getAllMatches();
     }
 
+    @MessageMapping("/endSet/{matchId}")
+    @SendTo("/topic/matches")
+    public List<Match> endSet(@DestinationVariable Long matchId) {
+        matchService.endSet(matchId);
+        return matchService.getAllMatches();
+    }
+
 }
