@@ -61,4 +61,10 @@ public class MatchController {
         return matchService.getAllMatches();
     }
 
+    @MessageMapping("/endMatch/{matchId}")
+    @SendTo("/topic/matches")
+    public List<Match> endMatch(@DestinationVariable Long matchId) {
+        matchService.endMatch(matchId);
+        return matchService.getAllMatches();
+    }
 }
