@@ -7,7 +7,9 @@ import com.example.volleyballscoreboardbackend.model.Match;
 import com.example.volleyballscoreboardbackend.repository.MatchRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -133,13 +135,29 @@ public class MatchService {
             String updatedTimeline = objectMapper.writeValueAsString(timelineList);
             match.setTimeline(updatedTimeline);
 
-
+            String resD = addResult(match.getResultDetailed(),teamAPoints + ":"+ teamBPoints);
+            match.setResultDetailed(resD);
             matchRepository.save(match);
-
-
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Failed to process timeline JSON", e);
         }
+    }
+
+    public void endMatch(Long matchId){
+        endSet(matchId);
+        Match match = matchRepository.findById(matchId).orElseThrow(() -> new IllegalArgumentException("match not found"));
+        match.setStatus(Match.Status.FINISHED);
+        String timeline = match.getTimeline();
+        try {
+            List<List<ScoreDto>> timelineList = objectMapper.readValue(timeline, new TypeReference<>() {});
+            timelineList.remove(timelineList.size()-1);
+            String updatedTimeline = objectMapper.writeValueAsString(timelineList);
+            match.setTimeline(updatedTimeline);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        matchRepository.save(match);
     }
 
     private static int calculateTeamPoints(List<ScoreDto> lastSet, Long id) {
@@ -155,5 +173,15 @@ public class MatchService {
         int teamAScore = Integer.parseInt(parts[0].trim());
         int teamBScore = Integer.parseInt(parts[1].trim());
         return new int[] { teamAScore, teamBScore };
+    }
+
+    public static String addResult(String jsonString, String newResult) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode rootNode = objectMapper.readTree(jsonString);
+        ArrayNode resDNode = (ArrayNode) rootNode.get("resD");
+
+        resDNode.add(newResult);
+
+        return objectMapper.writeValueAsString(rootNode);
     }
 }
