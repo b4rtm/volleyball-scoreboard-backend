@@ -37,7 +37,7 @@ public class MatchDtoMapper {
             match.setTimeline("[]");
         }
 
-        match.setSetsTimes("[]");
+        match.setSetsTimes(dto.getSetsTimes());
         match.setResultDetailed("{\"resD\": []}");
         match.setResult("0:0");
         return match;

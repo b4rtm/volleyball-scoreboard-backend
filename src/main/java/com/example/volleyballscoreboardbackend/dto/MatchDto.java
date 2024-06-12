@@ -13,6 +13,8 @@ public class MatchDto {
 
     private String status;
 
+    private String setsTimes;
+
     private Integer setsToWin;
 
     private Integer pointsToWinSet;
