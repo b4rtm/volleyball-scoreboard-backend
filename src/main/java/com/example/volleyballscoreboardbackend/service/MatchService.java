@@ -105,4 +105,55 @@ public class MatchService {
             throw new RuntimeException("Failed to process timeline JSON", e);
         }
     }
+
+    public void endSet(Long matchId){
+        Match match = matchRepository.findById(matchId).orElseThrow(() -> new IllegalArgumentException("match not found"));
+        try {
+            String timeline = match.getTimeline();
+            List<List<ScoreDto>> timelineList = objectMapper.readValue(timeline, new TypeReference<>() {});
+
+            List<ScoreDto> lastSet;
+            lastSet = timelineList.get(timelineList.size() - 1);
+
+            int teamAPoints = calculateTeamPoints(lastSet, match.getTeamA().getId());
+            int teamBPoints = calculateTeamPoints(lastSet, match.getTeamB().getId());
+
+            int[] scores = parseResult(match.getResult());
+
+            if(teamAPoints > teamBPoints){
+                int newScore = scores[0] + 1;
+                match.setResult(newScore + ":" + scores[1]);
+            }
+            else{
+                int newScore = scores[1] + 1;
+                match.setResult(scores[0] + ":" + newScore);
+            }
+
+            timelineList.add(new ArrayList<>());
+            String updatedTimeline = objectMapper.writeValueAsString(timelineList);
+            match.setTimeline(updatedTimeline);
+
+
+            matchRepository.save(match);
+
+
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to process timeline JSON", e);
+        }
+    }
+
+    private static int calculateTeamPoints(List<ScoreDto> lastSet, Long id) {
+        for(int i = lastSet.size() -1; i >= 0; i--){
+            if(lastSet.get(i).getTeamId().equals(id))
+                return lastSet.get(i).getPoint();
+        }
+        return 0;
+    }
+
+    public static int[] parseResult(String result) {
+        String[] parts = result.split(":");
+        int teamAScore = Integer.parseInt(parts[0].trim());
+        int teamBScore = Integer.parseInt(parts[1].trim());
+        return new int[] { teamAScore, teamBScore };
+    }
 }
