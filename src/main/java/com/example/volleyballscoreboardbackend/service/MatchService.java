@@ -43,6 +43,14 @@ public class MatchService {
         return matchRepository.findAll();
     }
 
+    public int getCurrentSetNumber(Long matchId){
+        Gson gson = new Gson();
+        Type setType = new TypeToken<List<SetRecord>>(){}.getType();
+        String setsTimes = matchRepository.getSetsTimesByMatchId(matchId);
+        List<SetRecord> setRecords = gson.fromJson(setsTimes, setType);
+        return setRecords.size() - 1;
+    }
+
     public Match addMatch(MatchDto matchDto) {
 
         Match match = matchDtoMapper.map(matchDto);
