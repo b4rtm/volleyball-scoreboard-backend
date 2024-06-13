@@ -67,4 +67,11 @@ public class MatchController {
         matchService.endMatch(matchId);
         return matchService.getAllMatches();
     }
+
+    @MessageMapping("/currentSetNumber/{matchId}")
+    @SendTo("/topic/currentSetNumber/{matchId}")
+    public int getCurrentSetNumber(@DestinationVariable Long matchId){
+        return matchService.getCurrentSetNumber(matchId);
+    }
+
 }
