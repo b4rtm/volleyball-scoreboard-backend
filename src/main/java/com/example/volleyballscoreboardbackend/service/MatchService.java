@@ -18,10 +18,7 @@ import java.time.LocalDateTime;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class MatchService {
@@ -118,22 +115,28 @@ public class MatchService {
         }
     }
 
-    public void endSet(Long matchId){
+    private List<SetRecord> updateSetsTimes(Long matchId, Gson gson, boolean endingMatch){
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        String formattedDateTime = currentDateTime.format(formatter);
+
+        String setsTimes = matchRepository.getSetsTimesByMatchId(matchId);
+        Type setType = new TypeToken<List<SetRecord>>(){}.getType();
+
+        List<SetRecord> setRecords = gson.fromJson(setsTimes, setType);
+        setRecords.get(setRecords.size() - 1).setSetEndTime(formattedDateTime);
+        if (!endingMatch)
+            setRecords.add(new SetRecord(formattedDateTime, ""));
+        return setRecords;
+    }
+
+    public Match endSet(Long matchId, boolean endingMatch){
         Match match = matchRepository.findById(matchId).orElseThrow(() -> new IllegalArgumentException("match not found"));
         try {
-            LocalDateTime currentDateTime = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-            String formattedDateTime = currentDateTime.format(formatter);
-
-            String setsTimes = matchRepository.getSetsTimesByMatchId(matchId);
 
             Gson gson = new Gson();
-            Type setType = new TypeToken<List<SetRecord>>(){}.getType();
 
-            List<SetRecord> setRecords = gson.fromJson(setsTimes, setType);
-            setRecords.get(setRecords.size() - 1).setSetEndTime(formattedDateTime);
-            setRecords.add(new SetRecord(formattedDateTime, ""));
-
+            List<SetRecord> setRecords = updateSetsTimes(matchId, gson, endingMatch);
             String timeline = match.getTimeline();
             List<List<ScoreDto>> timelineList = objectMapper.readValue(timeline, new TypeReference<>() {});
 
@@ -166,11 +169,11 @@ public class MatchService {
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Failed to process timeline JSON", e);
         }
+        return match;
     }
 
     public void endMatch(Long matchId){
-        endSet(matchId);
-        Match match = matchRepository.findById(matchId).orElseThrow(() -> new IllegalArgumentException("match not found"));
+        Match match = endSet(matchId, true);
         match.setStatus(Match.Status.FINISHED);
         String timeline = match.getTimeline();
         try {
