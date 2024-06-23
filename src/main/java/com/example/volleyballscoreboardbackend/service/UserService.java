@@ -20,4 +20,8 @@ public class UserService {
         userRepository.save(new User(authData.getLogin(), authData.getPassword(), User.Role.ROLE_OBSERVER));
         return "Pomyślnie dodano użytkownika do tabeli";
     }
+
+    public User getUserByEmail(String email){
+        return userRepository.getUserByLogin(email);
+    }
 }
