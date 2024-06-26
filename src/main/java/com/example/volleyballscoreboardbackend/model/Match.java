@@ -22,6 +22,7 @@ public class Match {
 
     private String result;
 
+    @Column(length = 20000)
     private String resultDetailed;
 
     private String timeline;
