@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -116,7 +118,8 @@ public class MatchService {
     }
 
     private List<SetRecord> updateSetsTimes(Long matchId, Gson gson, boolean endingMatch){
-        LocalDateTime currentDateTime = LocalDateTime.now();
+        ZoneId zoneId = ZoneId.of("Europe/Warsaw");
+        ZonedDateTime currentDateTime = ZonedDateTime.now(zoneId);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
         String formattedDateTime = currentDateTime.format(formatter);
 
